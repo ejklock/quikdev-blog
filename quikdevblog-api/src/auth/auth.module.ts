@@ -4,6 +4,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { JwtModule } from '@nestjs/jwt';
 import appConfig from 'src/config/app.config';
 import { UsersModule } from '../user/users.module';
+
 import { AuthGuard } from './auth.guard';
 import { AuthService } from './auth.service';
 
@@ -16,7 +17,18 @@ import { AuthService } from './auth.service';
         return {
           global: true,
           secret: appCfg.jwtSecret,
-          signOptions: { expiresIn: '60s' },
+          signOptions: {
+            audience: 'quikdevblog-api',
+            algorithm: 'HS256',
+            issuer: 'quikdevblog',
+            expiresIn: '1h',
+          },
+          verifyOptions: {
+            maxAge: '1h',
+            algorithms: ['HS256'],
+            issuer: 'quikdevblog',
+            audience: 'quikdevblog-api',
+          },
         };
       },
     }),

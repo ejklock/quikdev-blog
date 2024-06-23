@@ -34,20 +34,11 @@ export class AuthService {
   }
 
   private async generateJWT(user: User): Promise<string> {
-    return this.jwtService.signAsync(
-      {
-        sub: user.id,
-        name: user.name,
-        email: user.email,
-      },
-      {
-        algorithm: 'HS256',
-        expiresIn: '1h',
-        issuer: 'quikdevblog',
-        audience: 'quikdevblog-api',
-        secret: this.appCfg.jwtSecret,
-      },
-    );
+    return this.jwtService.signAsync({
+      sub: user.id,
+      name: user.name,
+      email: user.email,
+    });
   }
 
   async register(

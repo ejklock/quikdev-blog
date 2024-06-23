@@ -11,8 +11,8 @@ const config = {
   username: process.env.MYSQL_DATABASE_USER,
   password: process.env.MYSQL_DATABASE_PASSWORD,
   database: process.env.MYSQL_DATABASE_NAME,
-  migrations: [__dirname + '/../../migrations/*{.ts,.js}'],
-  entities: [__dirname + '/../../**/*.entity{.ts,.js}'],
+  migrations: [__dirname + '/../migrations/*{.ts,.js}'],
+  entities: [__dirname + '/../**/*.entity{.ts}'],
   synchronize: !!process.env.MYSQL_DATABASE_SYNCHRONIZE || false,
 };
 

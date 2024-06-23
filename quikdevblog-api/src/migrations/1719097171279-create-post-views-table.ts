@@ -5,55 +5,57 @@ import {
   TableForeignKey,
 } from 'typeorm';
 
-export class CreateCommentsTable1719075778532 implements MigrationInterface {
+export class CreatePostViewsTable1719097171279 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(
       new Table({
-        name: 'comments',
+        name: 'post_views',
         columns: [
           {
             name: 'id',
             type: 'int',
             isPrimary: true,
             isGenerated: true,
-          },
-          {
-            name: 'user_id',
-            type: 'int',
-            isNullable: false,
+            generationStrategy: 'increment',
           },
           {
             name: 'post_id',
             type: 'int',
             isNullable: false,
           },
-
           {
-            name: 'description',
-            type: 'text',
+            name: 'user_id',
+            type: 'int',
+            isNullable: true,
+          },
+          {
+            name: 'viewed_at',
+            type: 'timestamp',
+            default: 'now()',
           },
         ],
       }),
     );
+
     await queryRunner.createForeignKey(
-      'comments',
-      new TableForeignKey({
-        columnNames: ['user_id'],
-        referencedColumnNames: ['id'],
-        referencedTableName: 'users',
-      }),
-    );
-    await queryRunner.createForeignKey(
-      'comments',
+      'post_views',
       new TableForeignKey({
         columnNames: ['post_id'],
         referencedColumnNames: ['id'],
         referencedTableName: 'posts',
       }),
     );
+    await queryRunner.createForeignKey(
+      'post_views',
+      new TableForeignKey({
+        columnNames: ['user_id'],
+        referencedColumnNames: ['id'],
+        referencedTableName: 'users',
+      }),
+    );
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.dropTable('comments');
+    await queryRunner.dropTable('post_views');
   }
 }

@@ -16,6 +16,7 @@ export class CreatePostsTable1719075768236 implements MigrationInterface {
             type: 'int',
             isPrimary: true,
             isGenerated: true,
+            generationStrategy: 'increment',
           },
           {
             name: 'user_id',
@@ -30,6 +31,22 @@ export class CreatePostsTable1719075768236 implements MigrationInterface {
           {
             name: 'description',
             type: 'text',
+          },
+          {
+            name: 'image',
+            type: 'varchar',
+            isNullable: true,
+          },
+          {
+            name: 'created_at',
+            type: 'timestamp',
+            default: 'now()',
+          },
+
+          {
+            name: 'updated_at',
+            type: 'timestamp',
+            default: 'now()',
           },
         ],
       }),

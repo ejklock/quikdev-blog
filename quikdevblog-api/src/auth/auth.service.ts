@@ -1,22 +1,82 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  Inject,
+  Injectable,
+  InternalServerErrorException,
+  UnauthorizedException,
+} from '@nestjs/common';
+import { ConfigType } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { UsersService } from '../users/users.service';
+import * as bcrypt from 'bcrypt';
+import appConfig from 'src/config/app.config';
+import { User } from 'src/user/user.entity';
+import { UsersService } from '../user/users.service';
+import { Token } from './auth.types';
 
 @Injectable()
 export class AuthService {
   constructor(
+    @Inject(appConfig.KEY)
+    private appCfg: ConfigType<typeof appConfig>,
     private usersService: UsersService,
     private jwtService: JwtService,
   ) {}
 
-  async signIn(username: string, pass: string): Promise<any> {
-    const user = await this.usersService.findOne(username);
-    if (user?.password !== pass) {
+  private async encryptPassword(plainTextPassword: string): Promise<string> {
+    const salt = await bcrypt.genSalt();
+    return bcrypt.hash(plainTextPassword, salt);
+  }
+
+  private async checkPassword(
+    plainTextPassword: string,
+    hashedPassword: string,
+  ): Promise<boolean> {
+    return bcrypt.compare(plainTextPassword, hashedPassword);
+  }
+
+  private async generateJWT(user: User): Promise<string> {
+    return this.jwtService.signAsync(
+      {
+        sub: user.id,
+        name: user.name,
+        email: user.email,
+      },
+      {
+        algorithm: 'HS256',
+        expiresIn: '1h',
+        issuer: 'quikdevblog',
+        audience: 'quikdevblog-api',
+        secret: this.appCfg.jwtSecret,
+      },
+    );
+  }
+
+  async register(
+    name: string,
+    email: string,
+    plainTextPassword: string,
+  ): Promise<Token> {
+    const password = await this.encryptPassword(plainTextPassword);
+    const user = await this.usersService.store(name, email, password);
+
+    if (!user) {
+      throw new InternalServerErrorException('Error while creating user');
+    }
+
+    return {
+      type: 'bearer',
+      access_token: await this.generateJWT(user),
+    };
+  }
+  async login(email: string, pass: string): Promise<Token> {
+    const user = await this.usersService.findOneByEmail(email);
+
+    if (!user || !(await this.checkPassword(pass, user.password))) {
       throw new UnauthorizedException();
     }
-    const payload = { sub: user.userId, username: user.username };
+
     return {
-      access_token: await this.jwtService.signAsync(payload),
+      type: 'bearer',
+      access_token: await this.generateJWT(user),
     };
   }
 }

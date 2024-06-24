@@ -1,5 +1,6 @@
 import { BaseEntity } from 'src/utils/base.entity';
-import { Column, Entity } from 'typeorm';
+import { Column, Entity, OneToMany } from 'typeorm';
+import { Post } from '../post/post.entity';
 
 @Entity('users')
 export class User extends BaseEntity {
@@ -11,4 +12,7 @@ export class User extends BaseEntity {
 
   @Column()
   password: string;
+
+  @OneToMany(() => Post, (post) => post.user)
+  posts: Post[];
 }

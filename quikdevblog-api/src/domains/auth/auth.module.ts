@@ -9,6 +9,7 @@ import { PostModule } from '../post/post.module';
 import { UsersModule } from '../user/users.module';
 import { AuthGuard } from './auth.guard';
 import { AuthService } from './auth.service';
+import { MatchConstraint } from './decorators/match.decorator';
 
 @Module({
   imports: [
@@ -25,10 +26,10 @@ import { AuthService } from './auth.service';
             audience: 'quikdevblog-api',
             algorithm: 'HS256',
             issuer: 'quikdevblog',
-            expiresIn: '1h',
+            expiresIn: appCfg.jwtExpire,
           },
           verifyOptions: {
-            maxAge: '1h',
+            maxAge: appCfg.jwtExpire,
             algorithms: ['HS256'],
             issuer: 'quikdevblog',
             audience: 'quikdevblog-api',
@@ -45,6 +46,7 @@ import { AuthService } from './auth.service';
       provide: APP_GUARD,
       useClass: AuthGuard,
     },
+    MatchConstraint,
   ],
   controllers: [],
 })

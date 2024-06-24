@@ -1,7 +1,6 @@
 import { User } from 'src/domains/user/user.entity';
 import { BaseEntity } from 'src/utils/base.entity';
-import { Column, Entity, OneToMany, OneToOne } from 'typeorm';
-
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { PostLike } from './post-like/post-like.entity';
 import { PostNotLiked } from './post-not-liked/post-not-liked.entity';
 import { PostView } from './post-view/post-view.entity';
@@ -26,7 +25,8 @@ export class Post extends BaseEntity {
   @Column({ name: 'updated_at' })
   updatedAt: Date;
 
-  @OneToOne(() => User)
+  @ManyToOne(() => User, (user) => user.posts)
+  @JoinColumn({ name: 'user_id' })
   user: User;
 
   @OneToMany(() => PostView, (postView) => postView.post)

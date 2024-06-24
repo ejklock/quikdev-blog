@@ -11,7 +11,7 @@ import appConfig from 'src/config/app.config';
 import { User } from 'src/domains/user/user.entity';
 
 import { UsersService } from 'src/domains/user/users.service';
-import { Token } from './auth.types';
+import { AuthToken } from 'src/utils/app.types';
 
 @Injectable()
 export class AuthService {
@@ -46,7 +46,7 @@ export class AuthService {
     name: string,
     email: string,
     plainTextPassword: string,
-  ): Promise<Token> {
+  ): Promise<AuthToken> {
     const password = await this.encryptPassword(plainTextPassword);
     const user = await this.usersService.store({
       name,
@@ -59,11 +59,12 @@ export class AuthService {
     }
 
     return {
-      type: 'bearer',
+      token_type: 'bearer',
       access_token: await this.generateJWT(user),
+      expires_in: this.appCfg.jwtExpire,
     };
   }
-  async login(email: string, pass: string): Promise<Token> {
+  async login(email: string, pass: string): Promise<AuthToken> {
     const user = await this.usersService.findOneByEmail(email);
 
     if (!user || !(await this.checkPassword(pass, user.password))) {
@@ -71,8 +72,9 @@ export class AuthService {
     }
 
     return {
-      type: 'bearer',
+      token_type: 'bearer',
       access_token: await this.generateJWT(user),
+      expires_in: this.appCfg.jwtExpire,
     };
   }
 }

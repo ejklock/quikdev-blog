@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   Request,
 } from '@nestjs/common';
 
@@ -19,7 +20,7 @@ import { PostService } from 'src/domains/post/post.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 
-@Controller('post')
+@Controller('api/posts')
 export class PostController {
   constructor(
     private readonly postService: PostService,
@@ -37,8 +38,12 @@ export class PostController {
   }
 
   @Get()
-  findAll() {
-    return this.postService.getAllPostsWithViewsAndLikesCount();
+  findAll(@Query('page') page: number = 1, @Query('limit') limit: number = 10) {
+    console.log(page, limit);
+    return this.postService.getAllPostsWithViewsAndLikesCountPaginated(
+      page,
+      limit,
+    );
   }
 
   @Get(':id')

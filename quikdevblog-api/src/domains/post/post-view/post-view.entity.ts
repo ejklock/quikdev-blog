@@ -1,7 +1,7 @@
+import { User } from 'src/domains/user/user.entity';
 import { BaseEntity } from 'src/utils/base.entity';
 import { Column, Entity, JoinColumn, ManyToOne, OneToOne } from 'typeorm';
-import { User } from '../user/user.entity';
-import { Post } from './post.entity';
+import { Post } from '../post.entity';
 
 @Entity('post_views')
 export class PostView extends BaseEntity {

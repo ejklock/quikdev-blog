@@ -1,18 +1,17 @@
+import { User } from 'src/domains/user/user.entity';
 import { BaseEntity } from 'src/utils/base.entity';
-import { Column, Entity, JoinColumn, ManyToOne, OneToOne } from 'typeorm';
-import { User } from '../user/user.entity';
-import { Post } from './post.entity';
+import { Column, JoinColumn, ManyToOne, OneToOne } from 'typeorm';
+import { Post } from '../post.entity';
 
-@Entity('post_likes')
-export class PostLike extends BaseEntity {
+export class PostEditHistory extends BaseEntity {
   @Column({ name: 'post_id' })
   postId: number;
 
   @Column({ name: 'user_id' })
   userId: number;
 
-  @Column({ name: 'created_at' })
-  createdAt: Date;
+  @Column({ name: 'edited_at' })
+  editedAt: Date;
 
   @ManyToOne(() => Post, (post) => post.postLikes)
   @JoinColumn({ name: 'post_id' })

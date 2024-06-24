@@ -11,9 +11,10 @@ import {
 
 import { CheckOwnership } from 'src/domains/auth/decorators/check-ownership.decorator';
 
-import { PostLikeService } from 'src/domains/post/post-like.service';
-import { PostNotLikedService } from 'src/domains/post/post-not-liked.service';
-import { PostViewService } from 'src/domains/post/post-view.service';
+import { PostLikeService } from 'src/domains/post/post-like/post-like.service';
+import { PostNotLikedService } from 'src/domains/post/post-not-liked/post-not-liked.service';
+
+import { PostViewService } from 'src/domains/post/post-view/post-view.service';
 import { PostService } from 'src/domains/post/post.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';

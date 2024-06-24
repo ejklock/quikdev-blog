@@ -2,9 +2,9 @@ import { User } from 'src/domains/user/user.entity';
 import { BaseEntity } from 'src/utils/base.entity';
 import { Column, Entity, OneToMany, OneToOne } from 'typeorm';
 
-import { PostLike } from './post-like.entity';
-import { PostNotLiked } from './post-not-liked.entity';
-import { PostView } from './post-view.entity';
+import { PostLike } from './post-like/post-like.entity';
+import { PostNotLiked } from './post-not-liked/post-not-liked.entity';
+import { PostView } from './post-view/post-view.entity';
 
 @Entity({ name: 'posts' })
 export class Post extends BaseEntity {

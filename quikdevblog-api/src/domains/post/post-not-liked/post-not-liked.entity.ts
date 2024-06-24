@@ -1,8 +1,8 @@
 import { BaseEntity } from 'src/utils/base.entity';
 import { Column, Entity, JoinColumn, ManyToOne, OneToOne } from 'typeorm';
 
-import { User } from '../user/user.entity';
-import { Post } from './post.entity';
+import { User } from '../../user/user.entity';
+import { Post } from '../post.entity';
 
 @Entity('post_not_liked')
 export class PostNotLiked extends BaseEntity {

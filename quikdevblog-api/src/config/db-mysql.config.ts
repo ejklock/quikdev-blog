@@ -7,7 +7,7 @@ const config = {
   type: 'mysql',
   host: process.env.MYSQL_DATABASE_HOST,
   port: parseInt(process.env.MYSQL_DATABASE_PORT, 10) || 3306,
-  logging: !!parseInt(process.env.MYSQL_DATABASE_LOGGING) || false,
+  logging: !!parseInt(process.env.MYSQL_DATABASE_LOGGING) || true,
   username: process.env.MYSQL_DATABASE_USER,
   password: process.env.MYSQL_DATABASE_PASSWORD,
   database: process.env.MYSQL_DATABASE_NAME,

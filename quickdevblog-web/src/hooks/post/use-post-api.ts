@@ -9,7 +9,6 @@ const usePostApi = () => {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
   const [apiError, setApiError] = useState<Record<string, string>>();
-  const [postImage, setPostImage] = useState<File>();
 
   const fetchPostsPaginated = useCallback(async () => {
     await request<ApiPaginatedResponse<Post>>(
@@ -21,29 +20,6 @@ const usePostApi = () => {
       setError
     );
   }, [page, limit, request, setPosts, setError]);
-
-  const uploadPostImage = useCallback(
-    (image: File) => {
-      const formData = new FormData();
-      formData.append("image", postImage as any);
-      request(
-        "POST",
-        "posts/image",
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        },
-        (data) => {
-          console.log(data);
-          return data;
-        },
-        setError
-      );
-    },
-    [request, setError, postImage]
-  );
 
   const deletePost = useCallback(
     (id: number | string) => {
@@ -64,35 +40,34 @@ const usePostApi = () => {
     [request, fetchPostsPaginated, setError]
   );
 
-  const createPost = (values: PostFormCreate) => {
-    request(
-      "POST",
-      "posts",
-      values,
-      undefined,
-      () => {
-        uploadPostImage(values.image);
-        fetchPostsPaginated();
-      },
-      (error) => {
-        if (error.errors) {
-          const { errors } = error;
-          const errorsToSet = {} as {
-            [key: string]: string;
-          };
-
-          for (const field in errors) {
-            errorsToSet[field] = errors[field][0];
-          }
-
-          setApiError(error);
-          setError(error);
-        } else {
-          alert(error.message);
-        }
+  const createPost = useCallback(
+    async (values: PostFormCreate) => {
+      const { title, description, image } = values;
+      const formData = new FormData();
+      formData.append("title", title);
+      formData.append("description", description);
+      if (image) {
+        formData.append("image", image);
       }
-    );
-  };
+
+      request(
+        "POST",
+        "posts",
+        formData,
+        {
+          headers: {
+            "Content-Type": `multipart/form-data`,
+          },
+        },
+        () => {
+          fetchPostsPaginated();
+        },
+        setError
+      );
+    },
+
+    [request, fetchPostsPaginated, setError]
+  );
 
   const updatePost = useCallback(
     (values: Post) => {
@@ -155,8 +130,6 @@ const usePostApi = () => {
     updatePost,
     likePost,
     unlikePost,
-    uploadPostImage,
-    setPostImage,
   };
 };
 

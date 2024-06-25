@@ -17,7 +17,6 @@ export default function PostsComponent() {
     fetchPostsPaginated,
     deletePost,
     createPost,
-    setPostImage,
     updatePost,
     likePost,
     unlikePost,
@@ -45,7 +44,6 @@ export default function PostsComponent() {
   };
 
   const handleCreatePostButton = (values: PostFormCreate) => {
-    console.log(values);
     createPost({
       title: values?.title,
       description: values?.description,

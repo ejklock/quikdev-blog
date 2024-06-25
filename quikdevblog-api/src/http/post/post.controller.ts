@@ -2,13 +2,18 @@ import {
   Body,
   Controller,
   Delete,
+  FileTypeValidator,
   Get,
+  MaxFileSizeValidator,
   Param,
+  ParseFilePipe,
   Patch,
   Post,
   Put,
   Query,
   Request,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
 
 import { CheckOwnership } from 'src/domains/auth/decorators/check-ownership.decorator';
@@ -16,6 +21,8 @@ import { CheckOwnership } from 'src/domains/auth/decorators/check-ownership.deco
 import { PostLikeService } from 'src/domains/post/post-like/post-like.service';
 import { PostNotLikedService } from 'src/domains/post/post-not-liked/post-not-liked.service';
 
+import { FileInterceptor } from '@nestjs/platform-express';
+import { FileUploadService } from 'src/domains/file-upload/file-upload.service';
 import { PostViewService } from 'src/domains/post/post-view/post-view.service';
 import { PostService } from 'src/domains/post/post.service';
 import { CreatePostDto } from './dto/create-post.dto';
@@ -28,14 +35,40 @@ export class PostController {
     private readonly postLikeService: PostLikeService,
     private readonly postNotLikedService: PostNotLikedService,
     private readonly postViewService: PostViewService,
+    private readonly fileUploadService: FileUploadService,
   ) {}
 
   @Post()
-  store(@Request() req, @Body() createPostDto: CreatePostDto) {
-    return this.postService.store({
-      userId: req.user.sub,
-      ...createPostDto,
-    });
+  @UseInterceptors(FileInterceptor('file'))
+  async store(
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [
+          new MaxFileSizeValidator({ maxSize: 1000000 }),
+          new FileTypeValidator({ fileType: 'image/*' }),
+        ],
+      }),
+    )
+    file: Express.Multer.File,
+    @Request()
+    req,
+    @Body() createPostDto: CreatePostDto,
+  ) {
+    try {
+      const postImage = await this.fileUploadService.uploadFile(file);
+      const { title, description } = createPostDto;
+      return this.postService.store({
+        userId: req.user.sub,
+        title,
+        description,
+        image: postImage.path,
+      });
+    } catch (error) {
+      return {
+        success: false,
+        errors: error,
+      };
+    }
   }
 
   @Get()
@@ -59,12 +92,35 @@ export class PostController {
 
   @Patch(':id')
   @CheckOwnership('Post')
-  update(@Param('id') id: string, @Body() updatePostDto: UpdatePostDto) {
-    return this.postService.update(+id, {
-      image: updatePostDto.image,
-      title: updatePostDto.title,
-      description: updatePostDto.description,
-    });
+  @Post()
+  @UseInterceptors(FileInterceptor('file'))
+  async update(
+    @Param('id') id: number,
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [
+          new MaxFileSizeValidator({ maxSize: 1000000 }),
+          new FileTypeValidator({ fileType: 'image/*' }),
+        ],
+      }),
+    )
+    file: Express.Multer.File,
+    @Body() updatePostDto: UpdatePostDto,
+  ) {
+    try {
+      const postImage = await this.fileUploadService.uploadFile(file);
+      const { title, description } = updatePostDto;
+      return this.postService.update(id, {
+        title,
+        description,
+        image: postImage.path,
+      });
+    } catch (error) {
+      return {
+        success: false,
+        errors: error,
+      };
+    }
   }
   @CheckOwnership('Post')
   @Delete(':id')

@@ -6,8 +6,9 @@ import {
   Input,
   Stack,
 } from "@chakra-ui/react";
-import { Formik } from "formik";
+import { Field, Formik } from "formik";
 import { postValidationSchema } from "../../utils/validators";
+import ImageInput from "../ImageInput";
 
 export type PostFormProps = {
   readonly initialValues: Record<string, unknown>;
@@ -20,7 +21,6 @@ export default function PostForm({
   initialValues,
   resetForm,
   handleSubmit,
-  handlePostImageChange,
 }: PostFormProps) {
   return (
     <Formik
@@ -62,15 +62,10 @@ export default function PostForm({
               <FormErrorMessage>{errors.description}</FormErrorMessage>
             </FormControl>
             <FormControl isInvalid={!!errors.image}>
-              <FormLabel>Imagem</FormLabel>
-              <Input
+              <Field
                 name="image"
-                type="file"
-                onChange={(event) => {
-                  handlePostImageChange && handlePostImageChange(event);
-                  setFieldValue("image", event.currentTarget.files[0]);
-                }}
-                onBlur={handleBlur}
+                label="Upload de Imagem"
+                component={ImageInput}
               />
               <FormErrorMessage>{errors.image}</FormErrorMessage>
             </FormControl>

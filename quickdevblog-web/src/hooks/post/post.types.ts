@@ -5,6 +5,10 @@ export type User = {
   created_at?: Date;
 };
 
+export type FileUploadResponse = {
+  url: string;
+  path: string;
+};
 export type Post = {
   id?: number;
   title: string;

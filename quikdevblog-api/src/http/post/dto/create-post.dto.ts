@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsOptional } from 'class-validator';
+import { IsNotEmpty } from 'class-validator';
 
 export class CreatePostDto {
   @IsNotEmpty()
@@ -7,6 +7,5 @@ export class CreatePostDto {
   @IsNotEmpty()
   description: string;
 
-  @IsOptional()
-  image: string;
+  file: Express.Multer.File;
 }

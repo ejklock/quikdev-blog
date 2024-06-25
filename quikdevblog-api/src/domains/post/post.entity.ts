@@ -29,6 +29,12 @@ export class Post extends BaseEntity {
   @JoinColumn({ name: 'user_id' })
   user: User;
 
+  @Column({ select: false, insert: false, update: false })
+  likedByUser: boolean;
+
+  @Column({ select: false, insert: false, update: false })
+  dislikedByUser: boolean;
+
   @OneToMany(() => PostView, (postView) => postView.post)
   postViews: PostView[];
 

@@ -25,4 +25,5 @@ export const registerValidationSchema = Yup.object().shape({
 export const postValidationSchema = Yup.object().shape({
   title: Yup.string().required("O título é obrigatório"),
   description: Yup.string().required("A descrição é obrigatória"),
+  image: Yup.mixed().required("A imagem é obrigatória"),
 });

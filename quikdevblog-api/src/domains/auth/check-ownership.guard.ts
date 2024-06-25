@@ -30,6 +30,7 @@ export class CheckOwnershipGuard implements CanActivate {
     if (!entityManager) {
       return false;
     }
+    console.log(user, entityId);
 
     const entity = entityManager.getRepository(this.entityName).target;
 

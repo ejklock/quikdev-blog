@@ -12,6 +12,7 @@ export class EntityManagerMiddleware implements NestMiddleware {
   ) {}
 
   use(req: ExtendedRequest, res: Response, next: NextFunction) {
+    console.log(req);
     req.entityManager = this.entityManager;
     next();
   }

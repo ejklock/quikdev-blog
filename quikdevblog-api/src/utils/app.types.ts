@@ -28,6 +28,7 @@ export type PaginatedMeta = {
   current_page: number;
   from: number;
   last_page: number;
+  total: number;
 };
 
 export type RequestParams = {

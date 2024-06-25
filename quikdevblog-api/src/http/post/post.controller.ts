@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Post,
+  Put,
   Query,
   Request,
 } from '@nestjs/common';
@@ -38,11 +39,16 @@ export class PostController {
   }
 
   @Get()
-  findAll(@Query('page') page: number = 1, @Query('limit') limit: number = 10) {
+  findAll(
+    @Request() req,
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+  ) {
     console.log(page, limit);
     return this.postService.getAllPostsWithViewsAndLikesCountPaginated(
       page,
       limit,
+      req.user?.sub,
     );
   }
 
@@ -62,19 +68,22 @@ export class PostController {
   }
   @CheckOwnership('Post')
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.postService.remove(+id);
+  async remove(@Request() req, @Param('id') id: number) {
+    console.log(id);
+    await this.postLikeService.removePostLikeIfExist(id, req.user.sub);
+    await this.postNotLikedService.removePostNotLiked(id, req.user.sub);
+    return this.postService.remove(id);
   }
 
-  @Post(':id/like')
+  @Put(':id/like')
   async storePostLike(@Request() req, @Param('id') id: number) {
     await this.postNotLikedService.removePostNotLiked(id, req.user.sub);
     return await this.postLikeService.registerPostLike(id, req.user.sub);
   }
 
-  @Post(':id/unlike')
+  @Put(':id/unlike')
   async storePostUnLike(@Request() req, @Param('id') id: number) {
-    await this.postLikeService.removePostLike(id, req.user.sub);
+    await this.postLikeService.removePostLikeIfExist(id, req.user.sub);
     return await this.postNotLikedService.registerPostNotLiked(
       id,
       req.user.sub,

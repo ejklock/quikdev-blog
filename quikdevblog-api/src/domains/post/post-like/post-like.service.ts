@@ -25,7 +25,7 @@ export class PostLikeService extends BaseRepository<PostLike> {
     }
   }
 
-  async removePostLike(postId: number, userId: number) {
+  async removePostLikeIfExist(postId: number, userId: number) {
     try {
       await this.postLikeRepository.delete({ postId, userId });
       return true;

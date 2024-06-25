@@ -44,26 +44,53 @@ export class PostService extends BaseRepository<Post> {
   public async getAllPostsWithViewsAndLikesCountPaginated(
     page = 1,
     limit = 10,
+    userId?: number,
   ): Promise<ApiPaginatedResponse<Post>> {
-    const [result, total] = await this.getRepository()
+    const queryBuilder = this.getRepository()
       .createQueryBuilder('post')
       .leftJoin('post.user', 'user')
       .addSelect(['user.name'])
+
       .loadRelationCountAndMap(
-        'views.viewsCount',
+        'post.viewsCount',
         'post.postViews',
         'postViewsCount',
       )
       .loadRelationCountAndMap(
-        'likes.likesCount',
+        'post.likesCount',
         'post.postLikes',
         'postLikesCount',
       )
       .loadRelationCountAndMap(
-        'notLikes.notLikedCount',
+        'post.notLikedCount',
         'post.postNotLiked',
         'postNotLikedCount',
-      )
+      );
+
+    if (userId) {
+      queryBuilder
+        .leftJoin(
+          'post.postLikes',
+          'pl',
+          'pl.postId = post.id AND pl.userId = :userId',
+          { userId },
+        )
+        .leftJoin(
+          'post.postNotLiked',
+          'pln',
+          'pln.postId = post.id AND pln.userId = :userId',
+          { userId },
+        )
+
+        .addSelect(
+          '(CASE WHEN pl.userId = :userId THEN 1 ELSE NULL END) AS post_likedByUser',
+        )
+        .addSelect(
+          '(CASE WHEN pln.userId = :userId THEN 1 ELSE NULL END) AS post_dislikedByUser',
+        );
+    }
+
+    const [result, total] = await queryBuilder
       .orderBy('post.id', 'DESC')
       .skip((page - 1) * limit)
       .take(limit)
@@ -84,6 +111,7 @@ export class PostService extends BaseRepository<Post> {
         next: isEmpty ? null : `/api/post?page=${page + 1}&limit=${limit}`,
       },
       meta: {
+        total,
         current_page: page,
         from,
         last_page: lastPage,

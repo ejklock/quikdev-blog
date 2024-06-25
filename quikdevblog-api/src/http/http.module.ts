@@ -22,6 +22,9 @@ export class HttpModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(EntityManagerMiddleware)
-      .forRoutes({ path: 'post/*', method: RequestMethod.PATCH });
+      .forRoutes(
+        { path: '/api/posts/*', method: RequestMethod.PATCH },
+        { path: '/api/posts/*', method: RequestMethod.DELETE },
+      );
   }
 }

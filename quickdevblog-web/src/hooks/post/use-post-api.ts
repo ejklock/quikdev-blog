@@ -1,7 +1,7 @@
 import { useCallback, useState } from "react";
 import { ApiPaginatedResponse } from "../api/api.types";
 import useApi from "../api/use-api";
-import { Post } from "./post.types";
+import { Post, PostFormCreate } from "./post.types";
 
 const usePostApi = () => {
   const [posts, setPosts] = useState<ApiPaginatedResponse<Post>>();
@@ -9,6 +9,7 @@ const usePostApi = () => {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
   const [apiError, setApiError] = useState<Record<string, string>>();
+  const [postImage, setPostImage] = useState<File>();
 
   const fetchPostsPaginated = useCallback(async () => {
     await request<ApiPaginatedResponse<Post>>(
@@ -20,6 +21,29 @@ const usePostApi = () => {
       setError
     );
   }, [page, limit, request, setPosts, setError]);
+
+  const uploadPostImage = useCallback(
+    (image: File) => {
+      const formData = new FormData();
+      formData.append("image", postImage as any);
+      request(
+        "POST",
+        "posts/image",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        },
+        (data) => {
+          console.log(data);
+          return data;
+        },
+        setError
+      );
+    },
+    [request, setError, postImage]
+  );
 
   const deletePost = useCallback(
     (id: number | string) => {
@@ -37,16 +61,17 @@ const usePostApi = () => {
         }
       );
     },
-    [request, fetchPostsPaginated, setError, setApiError]
+    [request, fetchPostsPaginated, setError]
   );
 
-  const createPost = (values: Post) => {
+  const createPost = (values: PostFormCreate) => {
     request(
       "POST",
       "posts",
       values,
       undefined,
       () => {
+        uploadPostImage(values.image);
         fetchPostsPaginated();
       },
       (error) => {
@@ -84,6 +109,37 @@ const usePostApi = () => {
     },
     [request, fetchPostsPaginated, setError]
   );
+
+  const likePost = useCallback(
+    (postId: number) => {
+      request(
+        "PUT",
+        `posts/${postId}/like`,
+        undefined,
+        undefined,
+        () => {
+          fetchPostsPaginated();
+        },
+        setError
+      );
+    },
+    [request, fetchPostsPaginated, setError]
+  );
+  const unlikePost = useCallback(
+    (postId: number) => {
+      request(
+        "PUT",
+        `posts/${postId}/unlike`,
+        undefined,
+        undefined,
+        () => {
+          fetchPostsPaginated();
+        },
+        setError
+      );
+    },
+    [request, fetchPostsPaginated, setError]
+  );
   return {
     deletePost,
     fetchPostsPaginated,
@@ -97,6 +153,10 @@ const usePostApi = () => {
     posts,
     createPost,
     updatePost,
+    likePost,
+    unlikePost,
+    uploadPostImage,
+    setPostImage,
   };
 };
 

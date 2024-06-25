@@ -10,8 +10,8 @@ const usePostApi = () => {
   const [limit, setLimit] = useState(10);
   const [apiError, setApiError] = useState<Record<string, string>>();
 
-  const fetchPostsPaginated = useCallback(async () => {
-    await request<ApiPaginatedResponse<Post>>(
+  const fetchPostsPaginated = useCallback(() => {
+    request<ApiPaginatedResponse<Post>>(
       "GET",
       `posts?page=${page}&limit=${limit}`,
       undefined,
@@ -47,7 +47,7 @@ const usePostApi = () => {
       formData.append("title", title);
       formData.append("description", description);
       if (image) {
-        formData.append("image", image);
+        formData.append("file", image);
       }
 
       request(

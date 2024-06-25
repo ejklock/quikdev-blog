@@ -12,13 +12,14 @@ import ImageInput from "../ImageInput";
 
 export type PostFormProps = {
   readonly initialValues: Record<string, unknown>;
-  readonly handlePostImageChange: (e: any) => void;
+  readonly submitTitle: string;
   readonly handleSubmit: (e: any) => void;
   readonly resetForm: () => void;
 };
 
 export default function PostForm({
   initialValues,
+  submitTitle,
   resetForm,
   handleSubmit,
 }: PostFormProps) {
@@ -29,14 +30,7 @@ export default function PostForm({
       onReset={resetForm}
       onSubmit={handleSubmit}
     >
-      {({
-        values,
-        errors,
-        handleSubmit,
-        handleChange,
-        handleBlur,
-        setFieldValue,
-      }) => (
+      {({ values, errors, handleSubmit, handleChange, handleBlur }) => (
         <form onSubmit={handleSubmit}>
           <Stack spacing={4}>
             <FormControl isInvalid={!!errors.title}>
@@ -46,7 +40,7 @@ export default function PostForm({
                 type="text"
                 onChange={handleChange}
                 onBlur={handleBlur}
-                value={values.title}
+                value={values.title as string}
               />
               <FormErrorMessage>{errors.title}</FormErrorMessage>
             </FormControl>
@@ -55,7 +49,7 @@ export default function PostForm({
               <Input
                 name="description"
                 onChange={handleChange}
-                value={values.description}
+                value={values.description as string}
                 onBlur={handleBlur}
                 type="text"
               />
@@ -70,7 +64,7 @@ export default function PostForm({
               <FormErrorMessage>{errors.image}</FormErrorMessage>
             </FormControl>
             <Button type="submit" colorScheme="green">
-              Criar
+              {submitTitle}
             </Button>
           </Stack>
         </form>

@@ -9,6 +9,7 @@ import {
   Flex,
   Heading,
   IconButton,
+  Image,
   Menu,
   MenuButton,
   MenuItem,
@@ -19,91 +20,86 @@ import {
 import { useContext } from "react";
 import { BiChat, BiDislike, BiLike } from "react-icons/bi";
 import { BsThreeDotsVertical } from "react-icons/bs";
-import { User } from "../../hooks/post/post.types";
+import { PostDefined } from "../../hooks/post/post.types";
 import AuthContext from "../../store/auth/auth.context-provider";
+import { convertPathToApiPath } from "../../utils/transformers";
 
-type Post = {
-  id: number;
-  title: string;
-  userId: number;
-  likedByUser: boolean;
-  dislikedByUser: boolean;
-  viewsCount: number;
-  likesCount: number;
-  notLikedCount: number;
-  description: string;
-  user: User;
-  created_at: Date;
-};
-export type PostCardProps = {
-  data: Post[];
+export type PostDefinedCardProps = {
+  data: PostDefined[];
   handleLike: (id: number) => void;
+  handleEditPost: (id: PostDefined) => void;
   handleDislike: (id: number) => void;
-  handleDeletePost: (id: number) => void;
+  handleDeletePostDefined: (id: number) => void;
 };
 
-export default function PostCard({
+export default function PostDefinedCard({
   data,
   handleLike,
   handleDislike,
-  handleDeletePost,
-}: PostCardProps) {
+  handleEditPost,
+  handleDeletePostDefined,
+}: PostDefinedCardProps) {
   const { authState } = useContext(AuthContext);
   return (
     <Box>
       {data?.length > 0 &&
-        data?.map((post: Post) => (
-          <Card key={post.id} w={"xl"} mt={5} mb={5}>
+        data?.map((PostDefined: PostDefined) => (
+          <Card
+            key={PostDefined.id}
+            w={{ base: "sm", md: "md", lg: "xl" }}
+            mt={5}
+            mb={5}
+          >
             <CardHeader>
-              <Flex spacing="4">
-                <Flex flex="1" gap="5" alignItems="center" flexWrap="wrap">
+              <Flex>
+                <Flex flex="1" gap="3" alignItems="center" flexWrap="wrap">
                   <Avatar
                     size="sm"
-                    name={post?.user?.name}
+                    name={PostDefined?.user?.name}
                     src="https://bit.ly/sage-adebayo"
                   />
                   <Box>
-                    <Heading size="sm">{post?.user?.name}</Heading>
-                  </Box>
-
-                  <Box>
-                    <Heading size="md">{post?.title}</Heading>
+                    <Heading size="sm">{PostDefined?.user?.name}</Heading>
                   </Box>
                 </Flex>
-                <Flex
-                  flex="1"
-                  gap="4"
-                  alignItems="center"
-                  flexWrap="wrap"
-                ></Flex>
-                {authState?.isLoggedIn && authState?.userId == post.userId && (
-                  <Menu>
-                    <MenuButton
-                      as={IconButton}
-                      variant="ghost"
-                      colorScheme="gray"
-                      aria-label="See menu"
-                      icon={<BsThreeDotsVertical />}
-                    />
-                    <MenuList>
-                      <MenuItem onClick={() => handleDeletePost(post.id)}>
-                        Delete
-                      </MenuItem>
-                      <MenuItem>Edit</MenuItem>
-                    </MenuList>
-                  </Menu>
-                )}
+                {authState?.isLoggedIn &&
+                  authState?.userId == PostDefined.userId && (
+                    <Menu>
+                      <MenuButton
+                        as={IconButton}
+                        variant="ghost"
+                        colorScheme="gray"
+                        aria-label="See menu"
+                        icon={<BsThreeDotsVertical />}
+                      />
+                      <MenuList>
+                        <MenuItem
+                          onClick={() =>
+                            handleDeletePostDefined(PostDefined.id)
+                          }
+                        >
+                          Delete
+                        </MenuItem>
+                        <MenuItem onClick={() => handleEditPost(PostDefined)}>
+                          Edit
+                        </MenuItem>
+                      </MenuList>
+                    </Menu>
+                  )}
               </Flex>
+              <Heading mt={4} size={"md"}>
+                {PostDefined?.title}
+              </Heading>
             </CardHeader>
             <CardBody>
-              <Text>{post?.description}</Text>
+              <Text mb={5}>{PostDefined?.description}</Text>
             </CardBody>
-            {/* <Image
-              w={"100%"}
+            <Image
+              w={{ base: "sm", md: "md", lg: "xl" }}
               objectFit="cover"
-              src="https://images.unsplash.com/photo-1531403009284-440f080d1e12?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80"
+              src={convertPathToApiPath(PostDefined?.image)}
               alt="Chakra UI"
-            /> */}
+            />
 
             <CardFooter
               justify="space-between"
@@ -118,11 +114,12 @@ export default function PostCard({
                 key="like"
                 flex="1"
                 variant="ghost"
-                colorScheme={post.likedByUser ? "blue" : "gray"}
+                colorScheme={PostDefined.likedByUser ? "blue" : "gray"}
                 leftIcon={<BiLike />}
-                onClick={() => handleLike(post.id)}
+                onClick={() => handleLike(PostDefined.id)}
               >
-                {post.likesCount} | {post.likedByUser ? "Liked" : "Like"}
+                {PostDefined.likesCount} |{" "}
+                {PostDefined.likedByUser ? "Liked" : "Like"}
               </Button>
               <Button
                 key="comment"
@@ -136,12 +133,12 @@ export default function PostCard({
                 key="dislike"
                 flex="1"
                 variant="ghost"
-                colorScheme={post.dislikedByUser ? "blue" : "gray"}
+                colorScheme={PostDefined.dislikedByUser ? "blue" : "gray"}
                 leftIcon={<BiDislike />}
-                onClick={() => handleDislike(post.id)}
+                onClick={() => handleDislike(PostDefined.id)}
               >
-                {post.notLikedCount} |{" "}
-                {post.notLikedCount ? "Disliked" : "Dislike"}
+                {PostDefined.notLikedCount} |{" "}
+                {PostDefined.notLikedCount ? "Disliked" : "Dislike"}
               </Button>
             </CardFooter>
           </Card>

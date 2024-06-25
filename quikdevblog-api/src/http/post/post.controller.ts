@@ -77,14 +77,12 @@ export class PostController {
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 10,
   ) {
-    console.log(page, limit);
     return this.postService.getAllPostsWithViewsAndLikesCountPaginated(
       page,
       limit,
       req.user?.sub,
     );
   }
-
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.postService.findOne(+id);
@@ -125,7 +123,6 @@ export class PostController {
   @CheckOwnership('Post')
   @Delete(':id')
   async remove(@Request() req, @Param('id') id: number) {
-    console.log(id);
     await this.postLikeService.removePostLikeIfExist(id, req.user.sub);
     await this.postNotLikedService.removePostNotLiked(id, req.user.sub);
     return this.postService.remove(id);

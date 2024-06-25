@@ -23,6 +23,21 @@ export type Post = {
   created_at?: Date;
 };
 
+export type PostDefined = {
+  id: number;
+  title: string;
+  userId: number;
+  image: string;
+  likedByUser: boolean;
+  dislikedByUser: boolean;
+  viewsCount: number;
+  likesCount: number;
+  notLikedCount: number;
+  description: string;
+  user: User;
+  created_at: Date;
+};
+
 export type PostFormCreate = {
   title: string;
   description: string;
